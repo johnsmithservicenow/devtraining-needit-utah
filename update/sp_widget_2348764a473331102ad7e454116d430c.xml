@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[api.controller=function() {
+  /* widget controller */
+  var c = this;
+};]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id/>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {
+  
+}]]></link>
+        <name>War Room Meeting Details</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+    
+    data.table = $sp.getParameter('table');
+    data.sys_id = $sp.getParameter('sys_id');
+    
+    /** testing defaults - 
+    these are values we'll use 
+    until we put the widget on the page.
+    */
+    // data.table = 'u_virtual_war_room';
+    // data.sys_id = 'cd4fdd084f560300993533718110c7a7';
+    
+    // query for the current record
+    var gr = new GlideRecord(data.table);
+    gr.get(data.sys_id);
+    
+    data.number = gr.getValue('number');
+    data.appointments = getAppointments(data.sys_id);
+    
+    // get meeting information from Appointment table
+    function getAppointments(id) {
+        var appointment = {};
+        var appointments = [];
+        var grAppt = new GlideRecord('itil_appointment');
+        grAppt.addQuery('task', id);
+        grAppt.orderBy('starts');
+        grAppt.query();
+
+        while (grAppt.next()) {
+            /** for each appointment found, 
+            construct an object with the 
+            values for that appointment 
+            */
+            appointment = {};
+            appointment.subject = grAppt.getValue('subject');
+            appointment.startValue = grAppt.getValue('starts');
+            appointment.starts = grAppt.getDisplayValue('starts');
+            appointment.ends = grAppt.getDisplayValue('ends');
+            appointment.notes = grAppt.getValue('notes');
+            // push each object to the array.
+            appointments.push(appointment);
+        }
+        return appointments;
+    }
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-01-19 12:46:11</sys_created_on>
+        <sys_id>2348764a473331102ad7e454116d430c</sys_id>
+        <sys_mod_count>6</sys_mod_count>
+        <sys_name>War Room Meeting Details</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sp_widget_2348764a473331102ad7e454116d430c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-01-19 13:05:46</sys_updated_on>
+        <template><![CDATA[<div>
+  <div class="war-number">
+    {{data.number}}
+  </div>
+  <div class="meeting-info" ng-repeat="appointment in data.appointments">
+    <h4>
+      {{appointment.subject}}
+    </h4>
+    <div class="meeting-date">
+      Scheduled: {{appointment.starts}} - {{appointment.ends}}
+    </div>
+    <div class="meeting-notes">
+      {{appointment.notes}}
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>
